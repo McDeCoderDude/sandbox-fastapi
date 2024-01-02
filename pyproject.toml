@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "sandbox-fastapi"
+version = "1.0.0"
+description = "This is a playground for FastAPI development"
+authors = ["McKinney, Danny <DeCoderDude@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

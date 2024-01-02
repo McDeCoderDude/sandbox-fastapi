@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  mysql-leader:
+    image: mysql:8
+    container_name: mysql-leader
+    ports:
+      - "4406:3306"
+    command:
+      - --server-id=1
+      - --bind-address=0.0.0.0
+      - --host_cache_size=0
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --authentication_policy=mysql_native_password
+      - --log_bin=/var/lib/mysql/mysql-bin.log
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${LEADER_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${LEADER_DATABASE}
+      MYSQL_USER: ${LEADER_USER}
+      MYSQL_PASSWORD: ${LEADER_PASSWORD}
+    volumes:
+      - leader-data01:/var/lib/mysql
+      - ./leader:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - sandbox-mysql-cluster
+
+  mysql-replica:
+    image: mysql:8
+    container_name: mysql-replica
+    ports:
+      - "5506:3306"
+    command:
+      - --server-id=2
+      - --bind-address=0.0.0.0
+      - --character-set-server=utf8mb4
+      - --host_cache_size=0
+      - --collation-server=utf8mb4_unicode_ci
+      - --authentication_policy=mysql_native_password
+      - --log_bin=/var/lib/mysql/mysql-bin.log
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${REPLICA_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${REPLICA_DATABASE}
+      MYSQL_USER: ${REPLICA_USER}
+      MYSQL_PASSWORD: ${REPLICA_PASSWORD}
+    volumes:
+      - replica-data01:/var/lib/mysql
+      - ./replica:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - sandbox-mysql-cluster
+
+networks:
+  sandbox-mysql-cluster:
+    driver: bridge
+volumes:
+  leader-data01:
+    driver: local
+  replica-data01:
+    driver: local
+  
